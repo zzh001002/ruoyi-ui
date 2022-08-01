@@ -1,5 +1,6 @@
 <template>
-  <div class="app-container" @click.stop="show=false">
+  <div class="background">
+    <div class="app-container" @click.stop="show=false">
       <el-form :model="queryParams" ref="queryForm" size="small" :inline="true" v-show="showSearch" label-width="100px">
         <el-form-item label="工程分类名称" prop="name">
           <el-input
@@ -10,10 +11,12 @@
             @keyup.enter.native="handleQuery"
           />
         </el-form-item>
-        <el-form-item>
-          <el-button type="primary" icon="el-icon-search" size="mini" @click="handleQuery">搜索</el-button>
-          <el-button icon="el-icon-refresh" size="mini" @click="resetQuery">重置</el-button>
-        </el-form-item>
+        <div class="edit">
+          <el-form-item>
+            <el-button type="primary" icon="el-icon-search" size="mini" @click="handleQuery">搜索</el-button>
+            <el-button icon="el-icon-refresh" size="mini" @click="resetQuery">重置</el-button>
+          </el-form-item>
+        </div>
       </el-form>
       <el-row :gutter="10" class="mb8">
         <el-col :span="1.5"  @click="show= false">
@@ -38,15 +41,15 @@
 
 
 
-          <el-col :span="1.5"  @click="show= false">
-            <el-button
-              type="primary"
-              plain
-              icon="el-icon-download"
-              size="mini"
-              @click="handleExport"
-            >Excel批量导出</el-button>
-          </el-col>
+        <el-col :span="1.5"  @click="show= false">
+          <el-button
+            type="primary"
+            plain
+            icon="el-icon-download"
+            size="mini"
+            @click="handleExport"
+          >Excel批量导出</el-button>
+        </el-col>
 
         <el-col :span="1.5">
           <el-button
@@ -57,123 +60,125 @@
             @click.stop="show=true"
           >编辑</el-button>
         </el-col>
-          <div v-show="show" class="edit" @click.stop="show=true">
-              <el-button
-                type="info"
-                size="mini"
-                @click="handleAddsame"
-              >插入同级</el-button>
+        <div v-show="show" class="edit" @click.stop="show=true">
+          <el-button
+            type="info"
+            size="mini"
+            @click="handleAddsame"
+          >插入同级</el-button>
 
-              <el-button
-                type="info"
-                size="mini"
-                @click="handleAddson"
-              >插入子集</el-button>
-
-
-              <el-button
-                icon="el-icon-edit"
-                size="mini"
-                @click="handleUpdate"
-                :disabled="single"
-              ></el-button>
+          <el-button
+            type="info"
+            size="mini"
+            @click="handleAddson"
+          >插入子集</el-button>
 
 
-              <el-button
-                size="mini"
-                icon="el-icon-delete"
-                @click="handleDelete"
-                :disabled="multiple"
-              ></el-button>
+          <el-button
+            icon="el-icon-edit"
+            size="mini"
+            @click="handleUpdate"
+            :disabled="single"
+          ></el-button>
 
-              <el-button
-                icon="el-icon-bottom"
-                size="mini"
-                @click="moveDown"
-              ></el-button>
 
-              <el-button
-                icon="el-icon-top"
-                size="mini"
-                @click="moveUp"
-              ></el-button>
+          <el-button
+            size="mini"
+            icon="el-icon-delete"
+            @click="handleDelete"
+            :disabled="multiple"
+          ></el-button>
 
-            </div>
+          <el-button
+            icon="el-icon-bottom"
+            size="mini"
+            @click="moveDown"
+          ></el-button>
+
+          <el-button
+            icon="el-icon-top"
+            size="mini"
+            @click="moveUp"
+          ></el-button>
+
+        </div>
       </el-row>
-    <el-table
-      @selection-change="handleSelectionChange"
-      v-if="refreshTable"
-      v-loading="loading"
-      :data="engtypeList"
-      row-key="id"
-      :default-expand-all="isExpandAll"
-      :tree-props="{children: 'children', hasChildren: 'hasChildren'}"
-      :stripe="true"
-      class="tableClass"
-      :row-class-name='TableRowClassName'
-    >
-      <el-table-column type="selection" width="50" align="center" />
-      <el-table-column label="工程分类名称" prop="name"/>
-      <el-table-column label="编码"  prop="id" />
-      <el-table-column label="分类级别"prop="level" />
-      <el-table-column label="排序码"prop="orderno" />
-      <el-table-column label="创建人" align="center" prop="createby" />
-      <el-table-column label="修改人" align="center" prop="modifyby" />
-
-
-    </el-table>
-
-    <!-- 修改engtype对话框 -->
-    <el-dialog :title="title" :visible.sync="open" width="500px" append-to-body>
-      <el-form ref="form" :model="form" :rules="rules" label-width="80px">
-
-        <el-form-item label="工程分类名称" prop="name">
-          <el-input v-model="form.name" placeholder="请输入工程分类名称" />
-        </el-form-item>
-      </el-form>
-      <div slot="footer" class="dialog-footer">
-        <el-button type="primary" @click="submitForm">确 定</el-button>
-        <el-button class="can" @click="cancel">取 消</el-button>
-      </div>
-    </el-dialog>
-
-    <el-dialog :title="title" :visible.sync="openadd" width="500px" append-to-body>
-      <el-form ref="form" :model="form" :rules="rules" label-width="80px">
-        <el-form-item label="工程分类名称" prop="name">
-          <el-input v-model="form.name" placeholder="请输入工程分类名称" />
-        </el-form-item>
-        <el-form-item label="分类级别" prop="level">
-          <el-input v-model="form.level" placeholder="请输入分类级别" />
-        </el-form-item>
-      </el-form>
-      <div slot="footer" class="dialog-footer" align="center">
-        <el-button type="primary" @click="submitF">确 定</el-button>
-        <el-button class="can" @click="can">取 消</el-button>
-      </div>
-    </el-dialog>
-
-    <el-dialog :title="upload.title" :visible.sync="upload.open" width="400px" append-to-body>
-      <el-upload
-        ref="upload"
-        :limit="1"
-        accept=".xlsx, .xls"
-        :headers="upload.headers"
-        :action="upload.url + '?updateSupport=' + upload.updateSupport"
-        :disabled="upload.isUploading"
-        :on-progress="handleFileUploadProgress"
-        :on-success="handleFileSuccess"
-        :auto-upload="false"
-        drag
+      <el-table
+        @selection-change="handleSelectionChange"
+        v-if="refreshTable"
+        v-loading="loading"
+        :data="engtypeList"
+        row-key="id"
+        :default-expand-all="isExpandAll"
+        :tree-props="{children: 'children', hasChildren: 'hasChildren'}"
+        :stripe="true"
+        class="tableClass"
+        :row-class-name='TableRowClassName'
       >
-        <i class="el-icon-upload"></i>
-        <div class="el-upload__text">将文件拖到此处，或<em>点击上传</em></div>
-      </el-upload>
-      <div slot="footer" class="dialog-footer">
-        <el-button type="primary" @click="submitFileForm">确 定</el-button>
-        <el-button class="can" @click="upload.open = false">取 消</el-button>
-      </div>
-    </el-dialog>
+        <el-table-column type="selection" width="50" align="center" />
+        <el-table-column label="工程分类名称" prop="name"/>
+        <el-table-column label="编码"  prop="id" />
+        <el-table-column label="分类级别"prop="level" />
+        <el-table-column label="排序码"prop="orderno" />
+        <el-table-column label="创建人" align="center" prop="createby" />
+        <el-table-column label="修改人" align="center" prop="modifyby" />
+
+
+      </el-table>
+
+      <!-- 修改engtype对话框 -->
+      <el-dialog :title="title" :visible.sync="open" width="500px" append-to-body>
+        <el-form ref="form" :model="form" :rules="rules" label-width="80px">
+
+          <el-form-item label="工程分类名称" prop="name">
+            <el-input v-model="form.name" placeholder="请输入工程分类名称" />
+          </el-form-item>
+        </el-form>
+        <div slot="footer" class="dialog-footer">
+          <el-button type="primary" @click="submitForm">确 定</el-button>
+          <el-button class="can" @click="cancel">取 消</el-button>
+        </div>
+      </el-dialog>
+
+      <el-dialog :title="title" :visible.sync="openadd" width="500px" append-to-body>
+        <el-form ref="form" :model="form" :rules="rules" label-width="80px">
+          <el-form-item label="工程分类名称" prop="name">
+            <el-input v-model="form.name" placeholder="请输入工程分类名称" />
+          </el-form-item>
+          <el-form-item label="分类级别" prop="level">
+            <el-input v-model="form.level" placeholder="请输入分类级别" />
+          </el-form-item>
+        </el-form>
+        <div slot="footer" class="dialog-footer" align="center">
+          <el-button type="primary" @click="submitF">确 定</el-button>
+          <el-button class="can" @click="can">取 消</el-button>
+        </div>
+      </el-dialog>
+
+      <el-dialog :title="upload.title" :visible.sync="upload.open" width="400px" append-to-body>
+        <el-upload
+          ref="upload"
+          :limit="1"
+          accept=".xlsx, .xls"
+          :headers="upload.headers"
+          :action="upload.url + '?updateSupport=' + upload.updateSupport"
+          :disabled="upload.isUploading"
+          :on-progress="handleFileUploadProgress"
+          :on-success="handleFileSuccess"
+          :auto-upload="false"
+          drag
+        >
+          <i class="el-icon-upload"></i>
+          <div class="el-upload__text">将文件拖到此处，或<em>点击上传</em></div>
+        </el-upload>
+        <div slot="footer" class="dialog-footer">
+          <el-button type="primary" @click="submitFileForm">确 定</el-button>
+          <el-button class="can" @click="upload.open = false">取 消</el-button>
+        </div>
+      </el-dialog>
+    </div>
   </div>
+
 </template>
 
 <script>
@@ -238,6 +243,9 @@ export default {
   },
   created() {
     this.getList();
+    let name = ''
+    name = localStorage.getItem("name");
+    console.log( name ) //新增测试
 
   },
   methods: {
@@ -468,7 +476,7 @@ export default {
     },
     TableRowClassName({row, rowIndex}) {
       row.index = rowIndex
-      if (rowIndex%2==0) {
+      if (rowIndex%2==1) {
         return 'statistics-warning-row'
       } else {
         return ''
@@ -510,7 +518,7 @@ export default {
   float: right;
 }
 .statistics-warning-row {
-  background: #bfcbd9 !important;
+  background: #d9d9d9 !important;
 }
 .can{
   margin-top: 2px;
@@ -521,4 +529,13 @@ export default {
   height: 36px;
 
 }
+.app-main{
+  background: #d9d9d9;
+}
+
+.app-container{
+  background:#FFFFFF;
+}
+
+
 </style>
